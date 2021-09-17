@@ -7,23 +7,23 @@ const MockAdapter = require("axios-mock-adapter");
 
 class MockApiTrello {
   setupMock() {
-    const mock = new MockAdapter(axios, { delayResponse: 500 });
+    const mock = new MockAdapter(axios, { delayResponse: 0 });
 
     mock.onPost(URL.ADD_BOARD).reply((config: any) => {
+      const { data } = config;
+      let boards = mockData.addboards(data);
       return new Promise(function (resolve, reject) {
-        const { data } = config;
-        try {
-          const body = JSON.parse(data);
-          let boards = mockData.addboards(body);
-          resolve([200, boards]);
-        } catch (Error) {
-          let errorMessage = "Error occured while adding boards";
-          console.log(errorMessage);
-          reject(errorMessage);
-        }
+        return resolve([201, data]);
+      });
+    });
+    mock.onPost(URL.ADD_NEW_TASK_LIST).reply((config: any) => {
+      const { data } = config;
+      let reqData = JSON.parse(data);
+      mockData.addNewTaskList(reqData);
+      return new Promise(function (resolve, reject) {
+        return resolve([201, reqData]);
       });
     });
   }
 }
-const mockApiInstance = new MockApiTrello();
-export default mockApiInstance;
+export const mockApiInstance = new MockApiTrello();

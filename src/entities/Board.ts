@@ -10,5 +10,9 @@ class Board {
   setName(name: string) {
     this.name = name;
   }
+  addTaskList(taskListName: string) {
+    let newTask = new List(taskListName);
+    this.list.push(newTask);
+  }
 }
 export default Board;

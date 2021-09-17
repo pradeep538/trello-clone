@@ -12,11 +12,13 @@ console.log(Boards);
 declare const API_BASE_URL: string;
 
 function App() {
-  let apiInstance = new Api("" /* API_BASE_URL */, 5000);
-  useCaseInstance.initialize({
+  let apiInstance = new Api("trello.com" /* API_BASE_URL */, 5000);
+  useCaseInstance.apiInstance = apiInstance;
+  useCaseInstance.storeInstance = store;
+  /* useCaseInstance.initialize({
     api: apiInstance,
     store: store,
-  });
+  }); */
   return (
     <Provider store={store}>
       <div className="App">
