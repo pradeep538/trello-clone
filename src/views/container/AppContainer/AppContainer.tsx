@@ -8,8 +8,19 @@ import {
   selectedBoardData,
 } from "../../../usecases/views/trelloBoard";
 import ToggleForm from "../../components/ToggleForm/ToggleForm";
-import { addNewTaskListData } from "../../../usecases/views/newTask";
+import {
+  addNewTaskListData,
+  addTaskToListData,
+  toggleTaskStatus,
+  updateDragAndDropData,
+} from "../../../usecases/views/newTask";
 import { getSelectedBoardIndex } from "../../../utils/helpers";
+import List from "../../../entities/List";
+import {
+  TAddNewTask,
+  TDragAndDropMetadata,
+  TToggleTaskStatus,
+} from "../../../utils/types";
 interface Props {
   storeData: {
     boards: Board[];
@@ -18,17 +29,22 @@ interface Props {
 }
 const AppContainer = (props: Props) => {
   const [board, setBoard] = useState("");
-  const [currentBoard, setCurrentBoard] = useState<Board>();
+  const [currentBoard, setCurrentBoard] = useState<any>();
   const { storeData } = props;
   const { selectedBoard, boards } = storeData;
   useEffect(() => {
-    console.log("BOARD DATA===<", props);
-    let selectedBoardIndex = getSelectedBoardIndex(selectedBoard, boards);
-    setCurrentBoard(boards[selectedBoardIndex]);
-  }, [props, board]);
+    if (boards.length) {
+      let selectedBoardIndex = getSelectedBoardIndex(selectedBoard, boards);
+      setCurrentBoard({ ...boards[selectedBoardIndex] });
+    }
+  }, [props.storeData, board]);
 
-  const addTaskHandler = (input: string) => {
-    console.log("ADD TASK HANDLER==>", input);
+  const addTaskHandler = (newTaskData: any) => {
+    let newTask: TAddNewTask = {
+      selectedBoard: selectedBoard,
+      ...newTaskData,
+    };
+    addTaskToListData(newTask);
   };
   const addBoardHandler = async (event: any) => {
     event.preventDefault();
@@ -41,12 +57,25 @@ const AppContainer = (props: Props) => {
     selectedBoardData(selectedData);
   };
   const addNewListHandler = (inputData: string) => {
-    console.log(inputData);
     let addNewTaskListResponse = addNewTaskListData(inputData);
     addNewTaskListResponse.then((res: any) => {
       if (res.status === 201) {
       }
     });
+  };
+  const toggleTaskStatusHandler = (toggleTask: any) => {
+    let toggleTaskData: TToggleTaskStatus = {
+      selectedBoard: selectedBoard,
+      ...toggleTask,
+    };
+    toggleTaskStatus(toggleTaskData);
+  };
+  const updateTaskPosition = (
+    fromMetadata: TDragAndDropMetadata,
+    toMetadata: TDragAndDropMetadata
+  ) => {
+    console.log("DROPPED==>", selectedBoard, fromMetadata, toMetadata);
+    updateDragAndDropData(selectedBoard, fromMetadata, toMetadata);
   };
   return (
     <div className="container">
@@ -63,13 +92,20 @@ const AppContainer = (props: Props) => {
 
       <div className="task-list-container">
         {currentBoard &&
-          currentBoard.list.map((taskListItem, index) => {
+          currentBoard.list &&
+          currentBoard.list.map((taskListItem: List, index: number) => {
             return (
               <TaskListItem
                 key={taskListItem.name}
                 name={taskListItem.name}
                 taskList={taskListItem.tasks}
                 addTaskHandler={addTaskHandler}
+                taskListId={index}
+                toggleTaskStatus={(task: any) => {
+                  let taskData = { ...task, taskListId: index };
+                  toggleTaskStatusHandler(taskData);
+                }}
+                updateTaskPosition={updateTaskPosition}
               />
             );
           })}

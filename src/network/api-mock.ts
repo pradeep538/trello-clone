@@ -24,6 +24,30 @@ class MockApiTrello {
         return resolve([201, reqData]);
       });
     });
+    mock.onPost(URL.ADD_TASK_TO_LIST).reply((config: any) => {
+      const { data } = config;
+      let reqData = JSON.parse(data);
+      mockData.addTaskToList(reqData);
+      return new Promise(function (resolve, reject) {
+        return resolve([201, reqData]);
+      });
+    });
+    mock.onPost(URL.TOGGLE_TASK).reply((config: any) => {
+      const { data } = config;
+      let reqData = JSON.parse(data);
+      mockData.toggleTask(reqData);
+      return new Promise(function (resolve, reject) {
+        return resolve([201, reqData]);
+      });
+    });
+    mock.onPost(URL.UPDATE_DRAG_AND_DROP).reply((config: any) => {
+      const { data } = config;
+      let reqData = JSON.parse(data);
+      mockData.updateDragAndDrop(reqData);
+      return new Promise(function (resolve, reject) {
+        return resolve([201, reqData]);
+      });
+    });
   }
 }
 export const mockApiInstance = new MockApiTrello();

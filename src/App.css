@@ -115,7 +115,7 @@ html {
 .task {
   padding-left: 12px;
 }
-.task-list-radio:hover {
+.task-list-radio span:hover {
   cursor: pointer;
 }
 .task-completed {

@@ -11,3 +11,15 @@ export const addNewTaskList = (data: string) => ({
   type: Actions.ADD_NEW_TASK_LIST,
   payload: data,
 });
+export const addTaskToList = (data: string) => ({
+  type: Actions.ADD_TASK_TO_LIST,
+  payload: data,
+});
+export const toggleTask = (data: any) => ({
+  type: Actions.TOGGLE_TASK_STATUS,
+  payload: data,
+});
+export const updateDragAndDrop = (data: any) => ({
+  type: Actions.UPDATE_DRAG_AND_DROP,
+  payload: data,
+});

@@ -2,3 +2,6 @@ export const RESET_STORE = "RESET_STORE";
 export const ADD_BOARD = "ADD_BOARD";
 export const SELECTED_BOARD = "SELECTED_BOARD";
 export const ADD_NEW_TASK_LIST = "ADD_NEW_TASK_LIST";
+export const ADD_TASK_TO_LIST = "ADD_TASK_TO_LIST";
+export const TOGGLE_TASK_STATUS = "TOGGLE_TASK_STATUS";
+export const UPDATE_DRAG_AND_DROP = "UPDATE_DRAG_AND_DROP";

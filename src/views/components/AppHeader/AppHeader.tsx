@@ -22,8 +22,7 @@ const AppHeader = (props: Tprops) => {
           onChange={(event: any) => {
             let selected = event.target.value;
             let selectedData = {
-              boardId: selected.split("-")[0],
-              taskName: selected.split("-")[1],
+              taskName: selected,
             };
             props.handleSelectedOption(selectedData);
           }}
@@ -33,7 +32,7 @@ const AppHeader = (props: Tprops) => {
           )}
           {props.boards.map((board: Board, index) => {
             return (
-              <option key={index} value={index + "-" + board.name}>
+              <option key={board.name} value={board.name}>
                 {board.name}
               </option>
             );

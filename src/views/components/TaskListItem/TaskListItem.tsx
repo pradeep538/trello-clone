@@ -1,15 +1,37 @@
+import React from "react";
 import Task from "../../../entities/Task";
+import { TDragAndDropMetadata } from "../../../utils/types";
 import ToggleForm from "../ToggleForm/ToggleForm";
 
 export type TProps = {
   name: string;
-  addTaskHandler: (input: string) => void;
+  addTaskHandler: (taskData: any) => void;
   taskList?: Task[];
+  taskListId: number;
+  toggleTaskStatus: (taskStatus: any) => void;
+  updateTaskPosition: (
+    fromMetadata: TDragAndDropMetadata,
+    toMetadata: TDragAndDropMetadata
+  ) => void;
 };
 const TaskListItem = (props: TProps) => {
   const completedCount =
     (props.taskList && props.taskList.filter((item) => !item.status)) || [];
 
+  const onDropHandler = (event: any, toDropMetadata: TDragAndDropMetadata) => {
+    event.preventDefault();
+    let incomingData = event.dataTransfer.getData("text");
+    let [taskListMetadata, taskMetadata] = incomingData.split("_");
+    let fromMetadata: TDragAndDropMetadata = {
+      taskListId: parseInt(taskListMetadata.split("-")[1]),
+      taskID: parseInt(taskMetadata.split("-")[1]),
+    };
+    props.updateTaskPosition(fromMetadata, toDropMetadata);
+  };
+  const onDragStartHandler = (event: any, index: number) => {
+    let transferData = `taskListId-${props.taskListId}_taskId-${index}`;
+    event.dataTransfer.setData("text/plain", transferData);
+  };
   return (
     <div className="task-list-item task-created" draggable="true">
       <div className="task-item-container">
@@ -19,31 +41,58 @@ const TaskListItem = (props: TProps) => {
             <i className="fas fa-ellipsis-v"></i>
           </span>
         </div>
-        {/* <div className="add-task">
-          <a href="#" className="add-task" onClick={props.addTaskHandler}>
-            <i className="fas fa-plus"></i> <span>Add a task</span>
-          </a>
-        </div> */}
+
         <div className="add-task">
           <ToggleForm
             classOverride="add-new-list-override"
             inputPlaceHolder="Enter task name"
             actionLabel="Add a task"
-            submitHandler={props.addTaskHandler}
+            submitHandler={(input: string) => {
+              let task = {
+                taskName: input,
+                taskListId: props.taskListId,
+              };
+              props.addTaskHandler(task);
+            }}
           />
         </div>
         {props.taskList &&
           props.taskList.map((task, index) => {
-            if (task.status) {
-              return (
-                <div key={index} className="task-list-radio">
-                  <span className="task-circle">
+            return (
+              task.status && (
+                <div
+                  key={task.title}
+                  className="task-list-radio"
+                  draggable="true"
+                  onDragStart={(event: any) => {
+                    onDragStartHandler(event, index);
+                  }}
+                  onDrop={(event: any) => {
+                    onDropHandler(event, {
+                      taskListId: props.taskListId,
+                      taskID: index,
+                    });
+                  }}
+                  /* onDragEnter={(event: any) => {
+                    event.preventDefault();
+                  }} */
+                  onDragOver={(event: any) => {
+                    event.preventDefault();
+                  }}
+                >
+                  <span
+                    className="task-circle"
+                    onClick={() => {
+                      let task = { taskID: index };
+                      props.toggleTaskStatus(task);
+                    }}
+                  >
                     <i className="far fa-circle"></i>
                   </span>
                   <div className="task">{task.title}</div>
                 </div>
-              );
-            }
+              )
+            );
           })}
 
         <div className="completed-list">
@@ -55,7 +104,13 @@ const TaskListItem = (props: TProps) => {
               if (!task.status) {
                 return (
                   <div key={index} className="task-list-radio">
-                    <span className="task-circle">
+                    <span
+                      className="task-circle"
+                      onClick={() => {
+                        let task = { taskID: index };
+                        props.toggleTaskStatus(task);
+                      }}
+                    >
                       <i className="fas fa-check"></i>
                     </span>
                     <div className="task-completed">{task.title}</div>

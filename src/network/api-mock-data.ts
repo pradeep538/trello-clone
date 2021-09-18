@@ -3,8 +3,9 @@ import List from "../entities/List";
 import Task from "../entities/Task";
 import useCaseInstance from "../usecases/index";
 import { getSelectedBoard, getSelectedBoardIndex } from "../utils/helpers";
+import { TDragAndDropMetadata, TToggleTaskStatus } from "../utils/types";
 export const boardsStore: Board[] = [];
-export let boardsMock: Board[] = [];
+/* export let boardsMock: Board[] = [];
 let board1 = new Board("sample board 1");
 let board2 = new Board("sample board 2");
 let board3 = new Board("sample board 3");
@@ -28,7 +29,7 @@ board1.list.push(list5);
 boardsMock.push(board1);
 boardsMock.push(board2);
 boardsMock.push(board3);
-boardsMock.push(board4);
+boardsMock.push(board4); */
 
 export const addboards = (boardName: string) => {
   let board = new Board(boardName);
@@ -44,6 +45,35 @@ export const addNewTaskList = (taskData: any) => {
     store.boards
   );
   boardsStore[selectedBoardIndex].list.push(newTask);
-
   console.log("LOCAL DB=>", boardsStore);
+};
+export const addTaskToList = (taskData: any) => {
+  let store = useCaseInstance.storeInstance.getState().trelloReducer;
+  let selectedBoardIndex = getSelectedBoardIndex(
+    taskData.selectedBoard,
+    store.boards
+  );
+  let task = new Task(taskData.taskName);
+  boardsStore[selectedBoardIndex].list[taskData.taskListId].tasks.push(task);
+  console.log("LOCAL DB=>", boardsStore);
+};
+
+export const toggleTask = (taskData: TToggleTaskStatus) => {
+  let store = useCaseInstance.storeInstance.getState().trelloReducer;
+  let selectedBoardIndex = getSelectedBoardIndex(
+    taskData.selectedBoard,
+    store.boards
+  );
+  let { list } = boardsStore[selectedBoardIndex];
+  let { tasks } = list[taskData.taskListId];
+  let { status } = tasks[taskData.taskID];
+  tasks[taskData.taskID].status = !status;
+  console.log("LOCAL DB=>", boardsStore);
+};
+export const updateDragAndDrop = (dragAndDropMetadata: {
+  selectedBoard: string;
+  fromMetadata: TDragAndDropMetadata;
+  toMetadata: TDragAndDropMetadata;
+}) => {
+  return true;
 };
